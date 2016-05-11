@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+
+  "name": "Price Comparison",
+  "description": "Expose how websites personalize prices to you.",
+  "version": "0.0.1",
+
+  "background": {
+    "page": "background.html"
+  },    
+
+  "page_action": {
+    "default_title": "Price Personalization",
+    "default_icon":  {                    
+      "19": "images/icon19.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "webRequest",
+    "https://www.expedia.com/"
+  ]
+}

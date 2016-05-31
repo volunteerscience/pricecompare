@@ -3,20 +3,30 @@
  */
 //Lets require/import the HTTP module
 var http = require('http');
+var express = require('express');
+var bodyParser = require("body-parser");
+var app = express();
 
 //Lets define a port we want to listen to
 const PORT=7677; 
 
-//We need a function which handles requests and send response
-function handleRequest(request, response){
-  response.end('PriceCompare Path: ' + request.url);
-}
 
-//Create a server
-var server = http.createServer(handleRequest);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-//Lets start our server
-server.listen(PORT, function(){
+app.use('/', express.static('static'));
+
+app.get('/test', function (req, res)  {
+  res.send('PriceCompare Path: ' + req.url);
+});
+
+app.post('/reportPrice', function (req, res)  {
+  console.log('Report Price: ' + req.url);
+  console.log('Report Price: ' + request.body.foo);
+});
+
+//Lets start our app
+app.listen(PORT, function(){
   //Callback triggered when server is successfully listening. Hurray!
   console.log("Server listening on: http://localhost:%s", PORT);
 });

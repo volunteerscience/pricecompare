@@ -1,0 +1,17 @@
+/Hotel-Search:
+  ul class infoCol
+    span class actualPrice  .text()
+    span class hotelName  .text()
+	  
+	  
+// Airlines are awfully complicated: Airline, Location:Departure/Arrival Time:Departure/Arrival	  
+/packagesearch
+  h2 class fn name  .text()
+  span class formatted_price
+  
+/Flights-Search
+  article class flight-module
+    div class secondary
+  
+    div class offer-price
+      span class visuallyhidden .text()

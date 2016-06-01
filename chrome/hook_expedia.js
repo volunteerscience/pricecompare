@@ -23,9 +23,9 @@ $(function() {
 //    console.log('ajaxSend');
 //  }); 
 //
-//  $(document).ajaxSuccess(function(e, xhr, opt){
-//    console.log('ajaxSuccess');
-//  }); 
+  $(document).ajaxSuccess(function(e, xhr, opt){
+    console.log('ajaxSuccess');
+  }); 
 //
 //  $(document).ajaxError(function(e, xhr, opt){
 //    console.log('ajaxError');
@@ -38,7 +38,8 @@ $(function() {
 //  });
   
 //  chrome.runtime.sendMessage({"vs_prices": "hello"}, function(response) {
-  chrome.runtime.sendMessage({"vs_prices": [ {"name":"Apple","price":"1.55"} ] }, function(response) {
+  var vs_prices = [ {"name":"Apple","price":"1.55"} ];
+  chrome.runtime.sendMessage({"vs_prices": vs_prices, "search_id" : Math.floor(Math.random() * 99999999)}, function(response) {
 //    alert(response.uploaded);
   });
 });

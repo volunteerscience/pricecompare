@@ -24,6 +24,7 @@
   },
           
   "permissions": [
+    "http://localhost:7677/*", // server
     "activeTab",
     "tabs",
     "webRequest",

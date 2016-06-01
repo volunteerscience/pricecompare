@@ -1,17 +1,10 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+var reportURL = "http://localhost:7677/reportPrice/";
 
+var tabToSearchId = {} // tabId -> search_id
+var priceStore = {} // search_id -> col_name -> [ {name, price} ] 
 
-//function loadIntoPage() {
-//  chrome.tabs.executeScript(null, {"file": "jquery-2.2.0.min.js"});
-//  chrome.tabs.executeScript(null, {"file": "hook_expedia.js"});
-//}
-
-var reportURL = "localhost:7677/reportPrice/";
-
+// detect compatible page by url, inject hook
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-//  loadIntoPage();
   if (tab.url.indexOf("https://www.expedia.com/") == 0) {
 //    chrome.browserAction.setBadgeBackgroundColor([255,0,0,255]);
 //    chrome.browserAction.setBadgeText("foo");
@@ -22,16 +15,41 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 //            "19": "images/icon_g19.png",
 //            "38": "images/icon_g38.png"}});
     if (tab.url.indexOf("https://www.expedia.com/Hotel-Search") == 0) {
+      console.log("Setting Expedia Hook");
       chrome.tabs.executeScript(tabId, {"file": "jquery-2.2.0.min.js"});
       chrome.tabs.executeScript(tabId, {"file": "hook_expedia.js"});
       $("#bgLog").append("<p>hi "+tab.url+"</p>");
       chrome.browserAction.enable(tabId);
       return;
     }
-    
+
+    // set searchable
+    chrome.browserAction.setIcon({
+      path : {
+        "19": "images/icon_search19.png",
+        "38": "images/icon_search38.png"
+      },
+      tabId: tabId
+    });
+    return
   }
+  
+  // set normal
+  chrome.browserAction.setIcon({
+    path : {
+      "19": "images/icon19.png",
+      "38": "images/icon38.png"
+    },
+    tabId: tabId
+  });
 //  chrome.browserAction.disable(tabId);
 });
+
+
+
+
+
+
 
 chrome.webRequest.onCompleted.addListener(
     function(details) {
@@ -45,47 +63,91 @@ chrome.webRequest.onCompleted.addListener(
 });
 
 
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.hasOwnProperty('vs_prices')) {
-        // sender.tab
-//        chrome.browserAction.setIcon("images/icon_g19.png");
-//        chrome.browserAction.setIcon({path: "images/icon_g19.png"});
-//        console.log("vs_prices tab:"+sender.tab.id)
-        
-//        chrome.browserAction.setPopup({
-//          tabId: sender.tab.id,
-//          popup: 'popup_found.html'
-//        });
-        
-        var views = chrome.extension.getViews();
-        console.log("found this many views:"+views.length);
-
-        for (var i = 0; i < views.length; i++) {
-          var view = views[i];
-          console.log(view.url);
-        };
-        
-        chrome.browserAction.setIcon({
-          path : {
-            "19": "images/icon_found19.png",
-            "38": "images/icon_found38.png"
-          },
-          tabId: sender.tab.id
-        });
-        
-//        chrome.browserAction.setIcon({path: "images/icon_g19.png",  tabId: sender.tab});
-        
-        
-//        sendResponse({"uploaded": request.vs_prices[0]["name"]});        
-//        sendResponse({uploaded: "success"});        
-      }
-//      console.log(sender.tab ?
-//                  "from a content script:" + sender.tab.url :
-//                  "from the extension");
-//      if (request.vs_prices == "hello")
-//        sendResponse({farewell: "goodbye"});
+// receive messages
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.hasOwnProperty('vs_prices')) { // from the hook
+    tabToSearchId[sender.tab.id] = request.search_id;
+    priceStore[request.search_id] = {}
+    priceStore[request.search_id]["You"] = request.vs_prices
+    
+    // p:popup_found.html;
+    chrome.browserAction.setPopup({
+      tabId: sender.tab.id,
+      popup: 'popup_found.html'
+    });
+    
+    
+    // Light up found_icon;
+    chrome.browserAction.setIcon({
+      path : {
+        "19": "images/icon_found19.png",
+        "38": "images/icon_found38.png"
+      },
+      tabId: sender.tab.id
+    });
+    
+    broadcastVsColumn(sender.tab.id,"You");
+    
+    requestPriceComparisons();
+    
+    sendResponse({success: "true"});        
+    return;
+  }
+  
+  if (request.hasOwnProperty('vs_column_rebroadcast')) { // from the hook
+    broadcastVsColumns(request.vs_column_rebroadcast);
+    sendResponse({success: "true"});            
+  }
 });
+
+// to popup
+function broadcastVsColumn(tabId, key) {
+  var search_id = tabToSearchId[tabId];
+  var data = priceStore[search_id][key];
+  chrome.runtime.sendMessage({'vs_column': key, 'tab':tabId, 'data':data, 'search_id':search_id}, function(response) {
+//    console.log(response.farewell);
+  });
+}
+
+function broadcastVsColumns(tabId) {
+  for (var key in priceStore[tabToSearchId[tabId]]) {
+    broadcastVsColumn(tabId, key);
+  }
+}
+
+function requestPriceComparisons() {
+  requestPriceCompare("Generic")
+}
+
+function requestPriceCompare(searchUser) {
+  var x = new XMLHttpRequest();
+  x.open('POST', reportURL);
+  x.responseType = 'json';
+  x.onload = function() {
+  // Parse and process the response from Google Image Search.
+    var response = x.response;
+//    if (!response || !response.responseData || !response.responseData.results ||
+//        response.responseData.results.length === 0) {
+//      errorCallback('No response from Google Image search!');
+//      return;
+//    }
+//    var firstResult = response.responseData.results[0];
+//    // Take the thumbnail instead of the full image to get an approximately
+//    // consistent image size.
+//    var imageUrl = firstResult.tbUrl;
+//    var width = parseInt(firstResult.tbWidth);
+//    var height = parseInt(firstResult.tbHeight);
+//    console.assert(
+//        typeof imageUrl == 'string' && !isNaN(width) && !isNaN(height),
+//        'Unexpected respose from the Google Image Search API!');
+//    callback(imageUrl, width, height);
+    console.log("ajax success "+response);
+  };
+  x.onerror = function() {
+    console.log("ajax error");
+  };
+  x.send();
+}
 
 //chrome.browserAction.onClicked.addListener(function(tab) {
 //  

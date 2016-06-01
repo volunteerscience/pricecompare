@@ -89,6 +89,7 @@ function renderStatus(statusText) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  console.log("VS popup loaded");
   getCurrentTabUrl(function(url) {
     if (url.indexOf("https://www.expedia.com/") == 0) {
       $('#status').html('Please Do a Search on Expedia.');    

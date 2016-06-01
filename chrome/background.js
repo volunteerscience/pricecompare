@@ -52,10 +52,24 @@ chrome.runtime.onMessage.addListener(
 //        chrome.browserAction.setIcon("images/icon_g19.png");
 //        chrome.browserAction.setIcon({path: "images/icon_g19.png"});
 //        console.log("vs_prices tab:"+sender.tab.id)
+        
+//        chrome.browserAction.setPopup({
+//          tabId: sender.tab.id,
+//          popup: 'popup_found.html'
+//        });
+        
+        var views = chrome.extension.getViews();
+        console.log("found this many views:"+views.length);
+
+        for (var i = 0; i < views.length; i++) {
+          var view = views[i];
+          console.log(view.url);
+        };
+        
         chrome.browserAction.setIcon({
           path : {
-            "19": "images/icon_g19.png",
-            "38": "images/icon_g38.png"
+            "19": "images/icon_found19.png",
+            "38": "images/icon_found38.png"
           },
           tabId: sender.tab.id
         });
@@ -72,6 +86,10 @@ chrome.runtime.onMessage.addListener(
 //      if (request.vs_prices == "hello")
 //        sendResponse({farewell: "goodbye"});
 });
+
+//chrome.browserAction.onClicked.addListener(function(tab) {
+//  
+//});
 
 //// When the extension is installed or upgraded ...
 //chrome.runtime.onInstalled.addListener(function() {

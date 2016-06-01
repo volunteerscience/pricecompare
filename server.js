@@ -22,7 +22,10 @@ app.get('/test', function (req, res)  {
 
 app.post('/reportPrice', function (req, res)  {
   console.log('Report Price: ' + req.url);
-  console.log('Report Price: ' + req.body.foo);
+//  console.log('  '+req.body);
+  console.log('  Foo: ' + req.body.foo);
+  
+  res.end(JSON.stringify({'success':false}));
 });
 
 //Lets start our app

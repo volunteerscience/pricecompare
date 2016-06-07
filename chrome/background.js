@@ -33,7 +33,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
   
   // set normal
-  chrome.browserAction.setBadgeBackgroundColor([255,0,0,255]);
   chrome.browserAction.setIcon({
     path : {
       "19": "images/icon19.png",

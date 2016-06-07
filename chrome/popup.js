@@ -19,10 +19,6 @@ function getCurrentTab() {
     var tab = tabs[0];
 //    var url = tab.url;
     myTab = tab.id;
-    
-    chrome.runtime.sendMessage({"vs_column_rebroadcast": myTab}, function(response) {
-      
-    });
   });
 }
 
@@ -30,36 +26,21 @@ function renderStatus(statusText) {
 //  document.getElementById('status').textContent = statusText;
 }
 
+
+$(document).ready(function(){
+  $('body').on('click', 'a', function(){
+    // set the current tab
+    chrome.tabs.update(myTab, {url: $(this).attr('href')});
+    
+    // create a new tab
+//    chrome.tabs.create({url: $(this).attr('href')});
+    
+    window.close();
+    return false;
+  });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   console.log("VS popup loaded");
-  getCurrentTabUrl(function(url) {
-    if (url.indexOf("https://www.expedia.com/") == 0) {
-      $('#status').html('Please Do a Search on Expedia.');    
-      return;
-    }
-    $('#status').html('This page is incompatible with Price Personalization.');
-    
-    
-    
-//    // Put the image URL in Google search.
-//    renderStatus('Performing Google Image search for ' + url);
-//
-//    getImageUrl(url, function(imageUrl, width, height) {
-//
-//      renderStatus('Search term: ' + url + '\n' +
-//          'Google image search result: ' + imageUrl);
-//      var imageResult = document.getElementById('image-result');
-//      // Explicitly set the width/height to minimize the number of reflows. For
-//      // a single image, this does not matter, but if you're going to embed
-//      // multiple external images in your page, then the absence of width/height
-//      // attributes causes the popup to resize multiple times.
-//      imageResult.width = width;
-//      imageResult.height = height;
-//      imageResult.src = imageUrl;
-//      imageResult.hidden = false;
-//
-//    }, function(errorMessage) {
-//      renderStatus('Cannot display image. ' + errorMessage);
-//    });
-  });
+  getCurrentTab();
 });

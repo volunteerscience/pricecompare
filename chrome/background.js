@@ -71,7 +71,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     
     broadcastVsColumn(sender.tab.id,"You");
     
-    requestPriceComparisons();
+    requestPriceComparisons(request.query_url, request.search_id);
     
     sendResponse({success: "true"});        
     return;
@@ -84,25 +84,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // to popup
-function broadcastVsColumn(tabId, key) {
-  var search_id = tabToSearchId[tabId];
-  var data = priceStore[search_id][key];
-  chrome.runtime.sendMessage({'vs_column': key, 'tab':tabId, 'data':data, 'search_id':search_id}, function(response) {
+function broadcastVsColumn(tab_id, search_user) {
+  var search_id = tabToSearchId[tab_id];
+  var data = priceStore[search_id][search_user];
+  chrome.runtime.sendMessage({'vs_column': search_user, 'tab':tab_id, 'data':data, 'search_id':search_id}, function(response) {
 //    console.log(response.farewell);
   });
 }
 
-function broadcastVsColumns(tabId) {
-  for (var key in priceStore[tabToSearchId[tabId]]) {
-    broadcastVsColumn(tabId, key);
+function broadcastVsColumns(tab_id) {
+  for (var search_user in priceStore[tabToSearchId[tab_id]]) {
+    broadcastVsColumn(tab_id, search_user);
   }
 }
 
-function requestPriceComparisons() {
-  requestPriceCompare("Generic")
+function requestPriceComparisons(query_url, search_id, tab_id) {
+  requestPriceCompare("Generic", query_url, search_id, tab_id);
 }
 
-function requestPriceCompare(searchUser) {
+function requestPriceCompare(search_user, query_url, search_id, tab_id) {
   var x = new XMLHttpRequest();
   x.open('POST', reportURL);
   x.responseType = 'json';
@@ -111,21 +111,12 @@ function requestPriceCompare(searchUser) {
   // Parse and process the response from Google Image Search.
     var response = x.response;
     console.log("ajax success:"+response.success);
+    priceStore[search_id][search_user] = response.data;
+    broadcastVsColumn(tab_id, search_user);
   };
   x.onerror = function() {
     console.log("ajax error");
   };
-  x.send(JSON.stringify({'foo':'bar'}));
+  x.send(JSON.stringify({'user':search_user,'query_url':query_url,'search_id':search_id}));
 }
-
-//chrome.webRequest.onCompleted.addListener(
-//function(details) {
-////var leng = "?";
-////try {
-////  leng = details.responseHeaders.
-////}
-//$("#bgLog").append("<p>"+details.method+" "+details.url+"</p>");
-//},
-//{urls:["https://www.expedia.com/Hotel-Search*"]
-//});
 

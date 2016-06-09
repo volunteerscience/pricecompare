@@ -23,9 +23,13 @@ app.get('/test', function (req, res)  {
 app.post('/reportPrice', function (req, res)  {
   console.log('Report Price: ' + req.url);
 //  console.log('  '+req.body);
-  console.log('  Foo: ' + req.body.foo);
+  console.log('  url: ' + req.body.search_url);
   
-  res.end(JSON.stringify({'success':false}));
+  res.end(JSON.stringify({'success':false,
+    'data':[
+      {'name':'Apple','price':'12.00'},
+      {'name':'Cherry','price':'0.55'}
+    ]}));
 });
 
 //Lets start our app

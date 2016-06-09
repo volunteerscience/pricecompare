@@ -38,8 +38,13 @@ $(function() {
 //  });
   
 //  chrome.runtime.sendMessage({"vs_prices": "hello"}, function(response) {
-  var vs_prices = [ {"name":"Apple","price":"1.55"} ];
-  chrome.runtime.sendMessage({"vs_prices": vs_prices, "search_id" : Math.floor(Math.random() * 99999999)}, function(response) {
+  var vs_prices = [ {"name":"Apple","price":"1.55"}, {"name":"Orange","price":"2.55"}  ];
+  chrome.runtime.sendMessage({
+    "vs_prices": vs_prices, 
+    "query_url":window.location.href, 
+    "search_id" : Math.floor(Math.random() * 99999999)}, 
+    
+    function(response) {
 //    alert(response.uploaded);
   });
 });

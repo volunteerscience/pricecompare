@@ -27,7 +27,7 @@ app.post('/reportPrice', function (req, res)  {
   console.log('  search_user: ' + req.body.search_user);
   
   // TODO: Run Phantom on the query_url with the search_user profile and return the table
-  res.end(JSON.stringify({'success':false,
+  res.end(JSON.stringify({'success':true,
     'data':[
       {'name':'Apple','price':'12.00'},
       {'name':'Cherry','price':'0.55'}

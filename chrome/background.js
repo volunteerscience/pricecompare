@@ -117,6 +117,6 @@ function requestPriceCompare(search_user, query_url, search_id, tab_id) {
   x.onerror = function() {
     console.log("ajax error");
   };
-  x.send(JSON.stringify({'user':search_user,'query_url':query_url,'search_id':search_id}));
+  x.send(JSON.stringify({'search_user':search_user,'query_url':query_url,'search_id':search_id}));
 }
 

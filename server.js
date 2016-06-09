@@ -22,9 +22,11 @@ app.get('/test', function (req, res)  {
 
 app.post('/reportPrice', function (req, res)  {
   console.log('Report Price: ' + req.url);
-//  console.log('  '+req.body);
-  console.log('  url: ' + req.body.search_url);
+  console.log('  '+JSON.stringify(req.body));
+  console.log('  url: ' + req.body.query_url);
+  console.log('  search_user: ' + req.body.search_user);
   
+  // TODO: Run Phantom on the query_url with the search_user profile and return the table
   res.end(JSON.stringify({'success':false,
     'data':[
       {'name':'Apple','price':'12.00'},
